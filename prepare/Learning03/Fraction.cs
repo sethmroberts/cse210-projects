@@ -1,8 +1,11 @@
+
+using System.Diagnostics;
+using System.Xml.Schema;
+
 /// <summary>
 /// Represents a fraction with a numerator and denominator
 /// This is more accurate than storing a double.
 /// </summary>
-
 public class Fraction
 {
     private int _numer;
