@@ -1,8 +1,4 @@
 // VisualizationActivity.cs
-using System;
-using System.Collections.Generic;
-using System.Threading;
-
 public class VisualizationActivity : MindfulnessActivity
 {
     private List<string> _visualizations = new List<string>

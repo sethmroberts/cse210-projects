@@ -1,10 +1,8 @@
-using System;
-using System.Threading;
-
+//BreathingActivity.cs
 public class BreathingActivity : MindfulnessActivity
 {
-    public BreathingActivity() 
-        : base("Breathing", 
+    public BreathingActivity()
+        : base("Breathing",
                "This activity will help you relax by guiding you through slow breathing. Clear your mind and focus on your breath.")
     {
     }

@@ -1,8 +1,4 @@
 // ListingActivity.cs
-using System;
-using System.Collections.Generic;
-using System.Threading;
-
 public class ListingActivity : MindfulnessActivity
 {
     private List<string> _prompts = new List<string>
