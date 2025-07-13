@@ -1,9 +1,13 @@
-using System;
+using RPG.Game;
 
-class Program
+namespace RPG
 {
-    static void Main(string[] args)
+    class Program
     {
-        Console.WriteLine("Hello FinalProject World!");
+        static void Main(string[] args)
+        {
+            GameManager game = new GameManager();
+            game.Run();
+        }
     }
 }
