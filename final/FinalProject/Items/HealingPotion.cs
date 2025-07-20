@@ -11,6 +11,7 @@ namespace RPG.Items
 
         public override void Use(RPG.Characters.Character target)
         {
+            target.Heal(healAmount);
         }
     }
 }

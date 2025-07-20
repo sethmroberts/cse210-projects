@@ -1,13 +1,16 @@
 using System;
 using RPG.Characters;
+using RPG.Items;
 
 namespace RPG.Game
 {
     public class GameManager
     {
-        private Player player;
+        private Player player = null;
         private Character enemy;
         private Random rng = new Random();
+        private int enemiesDefeated = 0;
+        private int totalDamageDealt = 0;
 
         public GameManager()
         {
@@ -16,67 +19,112 @@ namespace RPG.Game
 
         public void Run()
         {
-            Console.WriteLine("Game starting...");
-            enemy = GenerateRandomEnemy();
-            Console.WriteLine($"A wild {enemy.GetType().Name} appears!");
+            Console.Clear();
+            Console.WriteLine("Welcome to the RPG Adventure!");
+            Console.Write("Enter your hero's name: ");
+            string name = Console.ReadLine();
+            player = new Player(name);
+
             Console.WriteLine();
+            Console.WriteLine("You awaken at a quiet campfire with two items before you:");
+            var starterWeapon = new Club();
+            var starterPotion = new HealingPotion("Small Healing Potion", 10, 15);
+            Console.WriteLine($"1. {starterWeapon.GetName()}");
+            Console.WriteLine($"2. {starterPotion.GetName()}");
 
-            HandleTurn();
-
-            Console.WriteLine();
-            Console.WriteLine("Battle over.");
-            player.DisplayStats();
-            enemy.DisplayStats();
-        }
-
-        public void HandleTurn()
-        {
-            Console.WriteLine("Your turn!");
-            Console.WriteLine("1. Attack");
-            Console.WriteLine("2. Do nothing");
-            Console.Write("Choose an action: ");
-            string input = Console.ReadLine();
-
-            if (input == "1")
+            Console.Write("Choose one to take with you (1 or 2): ");
+            string starterChoice = Console.ReadLine();
+            if (starterChoice == "2")
             {
-                int playerDamage = player.Attack();
-                enemy.TakeDamage(playerDamage);
-                Console.WriteLine($"You dealt {playerDamage} damage to the {enemy.GetType().Name}.");
+                player.Equip(starterPotion);
             }
             else
             {
-                Console.WriteLine("You hesitate...");
+                player.Equip(starterWeapon);
             }
 
-            if (!enemy.IsAlive())
+            Console.WriteLine("You tuck the item into your pack.");
+            Console.WriteLine("Press Enter to enter the campfire and prepare...");
+            Console.ReadLine();
+
+            new Campfire(player).Enter();
+
+            Console.Clear();
+            Console.WriteLine("You head out on your adventure!");
+            Console.WriteLine();
+
+            while (player.IsAlive())
             {
-                Console.WriteLine($"The {enemy.GetType().Name} has been defeated!");
-                return;
+                enemy = GenerateRandomEnemy();
+                Console.Clear();
+                Console.WriteLine($"A wild {enemy.GetName()} appears!");
+                Console.WriteLine($"Health: {enemy.GetHealth()}");
+                Console.WriteLine();
+                Console.WriteLine("Press Enter to begin the fight...");
+                Console.ReadLine();
+                Console.Clear();
+
+                while (enemy.IsAlive() && player.IsAlive())
+                {
+                    var battle = new BattleManager(player, enemy);
+                    totalDamageDealt += battle.StartBattle();
+                }
+
+                if (!player.IsAlive()) break;
+
+                enemiesDefeated++;
+                Console.WriteLine($"You defeated the {enemy.GetType().Name}!");
+                Console.WriteLine($"{enemy.GetType().Name}'s last words: \"{enemy.MakeSound()}\"");  // 👈 Add this line
+
+                var reward = RewardManager.ChooseReward();
+                player.Equip(reward);
+                Console.WriteLine($"{reward.GetName()} added to your inventory.");
+                Console.WriteLine();
+
+                if (enemiesDefeated % 2 == 0)
+                {
+                    new Campfire(player).Enter();
+                }
             }
 
-            Console.WriteLine($"{enemy.GetType().Name}'s turn!");
-            int enemyDamage = enemy.Attack();
-            player.TakeDamage(enemyDamage);
-            Console.WriteLine($"You took {enemyDamage} damage!");
+            Console.WriteLine("You have fallen...");
+            Console.WriteLine("Final Stats:");
+            player.DisplayStats();
+            Console.WriteLine($"Enemies defeated: {enemiesDefeated}");
+            Console.WriteLine($"Total damage dealt: {totalDamageDealt}");
         }
-
 
         public Character GenerateRandomEnemy()
         {
-            int roll = rng.Next(4);
-            switch (roll)
-            {
-                case 0: return new Goblin();
-                case 1: return new Dragon();
-                case 2: return new Rock();
-                case 3: return new Troll();
-                default: return new Goblin();
-            }
-        }
+            int tier = enemiesDefeated;
 
-        public RPG.Items.Item GenerateRandomItem()
-        {
-            return null;
+            if (tier < 2)
+            {
+                return rng.Next(2) == 0 ? new Goblin() : new Rock();
+            }
+            else if (tier < 4)
+            {
+                int roll = rng.Next(3);
+                return roll switch
+                {
+                    0 => new Goblin(),
+                    1 => new Rock(),
+                    2 => new Troll(),
+                    _ => new Goblin()
+                };
+            }
+            else
+            {
+                int roll = rng.Next(4);
+                return roll switch
+                {
+                    0 => new Goblin(),
+                    1 => new Rock(),
+                    2 => new Troll(),
+                    3 => new Dragon(),
+                    _ => new Goblin()
+                };
+            }
         }
     }
 }

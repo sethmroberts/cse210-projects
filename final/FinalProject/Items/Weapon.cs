@@ -11,6 +11,15 @@ namespace RPG.Items
 
         public override void Use(RPG.Characters.Character target)
         {
+            if (target is RPG.Characters.Player player)
+            {
+                player.EquipWeapon(this);
+            }
+        }
+
+        public int GetDamageBoost()
+        {
+            return damageBoost;
         }
     }
 }
